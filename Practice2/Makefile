@@ -1,14 +1,13 @@
 CC=g++
 CFLAGS=-c -g
-SOURCES=main.cpp
 EXECUTABLE=main
 
-all:	$(EXECUTABLE)
+all:	$(EXECUTABLE) clean
 
 $(EXECUTABLE): main.o
-	$(CC)  main.o -o $(EXECUTABLE)
+	$(CC) -g main.o -o $(EXECUTABLE)
 
 main.o: main.cpp
-	g++ $(CFLAGS) main.cpp
+	$(CC) $(CFLAGS) main.cpp
 clean:
-	rm -rf *.o $(EXECUTABLE)
+	del /q *.o
