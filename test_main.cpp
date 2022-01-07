@@ -44,3 +44,43 @@ int main() {
 	_CrtDumpMemoryLeaks();
 	return 0;
 }
+
+
+
+
+
+
+
+
+
+
+int main() {
+	srand(time(NULL));
+	setlocale(LC_ALL, "Russian");
+	std::string dimension[2] = { "Город","Дата" };
+	std::string measures[1] = {"Температура"};
+	double  elapsed_ns = 0;
+	long k = 0;
+	Cube* cube = new Cube();
+	cube->add_Dimension(dimension[0]);
+	cube->add_Dimension(dimension[1]);
+	cube->add_Measure(measures[0]);
+	for (int city_c = 0; city_c < 5; city_c++) {
+		for (int date_c = 0; date_c < 20; date_c++) {
+			cube->add_Fact((double)facts[city_c][date_c], "Температура", { cities[city_c],dates[date_c]});
+		}
+	}
+	//while (k < 100000) {
+		//auto begin = std::chrono::steady_clock::now();
+		cube->selection("Дата", {"15 мая", "19 мая" , "1 июня"});
+		cube->selection("Город", { "Ржев" });
+		//auto end = std::chrono::steady_clock::now();
+		//elapsed_ns += std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+		//k++;
+		cube->clean_selection();
+	//}
+	//std::cout << std::setprecision(4) << (elapsed_ns / 100000) / 1000000;
+	delete cube;
+	_CrtDumpMemoryLeaks();
+	return 0;
+}
