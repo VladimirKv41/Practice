@@ -1,16 +1,16 @@
 #pragma once
 #include <string>
 
-// Метрика
+// РњРµС‚СЂРёРєР°
 class Measure {
 public:
 
 	Measure(const std::string &a_name);
 
-	// Получение название Метрики
+	// РџРѕР»СѓС‡РµРЅРёРµ РЅР°Р·РІР°РЅРёРµ РњРµС‚СЂРёРєРё
 	const std::string& get_name() const;
 
 private:
-	// Название Метрики
+	// РќР°Р·РІР°РЅРёРµ РњРµС‚СЂРёРєРё
 	std::string m_name;
 };

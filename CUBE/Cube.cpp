@@ -17,9 +17,9 @@ Cube::Cube() : m_selection(nullptr){
 
 }
 
-// добавление Измерения
-// Если уже существует, вернет False
-//                             Название Измерения
+// Р”РѕР±Р°РІР»РµРЅРёРµ РР·РјРµСЂРµРЅРёСЏ
+// Р•СЃР»Рё СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚, РІРµСЂРЅРµС‚ False
+//                             РќР°Р·РІР°РЅРёРµ РР·РјРµСЂРµРЅРёСЏ
 bool Cube::add_Dimension(const std::string& a_dim_name) {
 	for (std::vector<Dimension*>::iterator it = m_dims.begin(); it != m_dims.end(); it++) {
 		if ((*it)->get_name() == a_dim_name) {
@@ -30,9 +30,9 @@ bool Cube::add_Dimension(const std::string& a_dim_name) {
 	return true;
 }
 
-// добавление Метрики
-// Если уже существует, вернет False
-//                           Название Метрики
+// Р”РѕР±Р°РІР»РµРЅРёРµ РњРµС‚СЂРёРєРё
+// Р•СЃР»Рё СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚, РІРµСЂРЅРµС‚ False
+//                           РќР°Р·РІР°РЅРёРµ РњРµС‚СЂРёРєРё
 bool Cube::add_Measure(const std::string& a_measure_name) {
 	for (std::vector<Measure*>::iterator it = m_measures.begin(); it != m_measures.end(); it++) {
 		if ((*it)->get_name() == a_measure_name) {
@@ -43,18 +43,18 @@ bool Cube::add_Measure(const std::string& a_measure_name) {
 	return true;
 }
 
-// Добавление Факта
-// 1. Итерация по Метрикам, Факт добавляется только с указанной Метрикой.
-// 2. Поиск Факта в уже добавленных ранее.
-// 3. Добавление Факта и ТочекДанных.
-//                    Значение Факта     Название Метрики               Список позиций в Измерениях
+// Р”РѕР±Р°РІР»РµРЅРёРµ Р¤Р°РєС‚Р°
+// 1. РС‚РµСЂР°С†РёСЏ РїРѕ РњРµС‚СЂРёРєР°Рј, Р¤Р°РєС‚ РґРѕР±Р°РІР»СЏРµС‚СЃСЏ С‚РѕР»СЊРєРѕ СЃ СѓРєР°Р·Р°РЅРЅРѕР№ РњРµС‚СЂРёРєРѕР№.
+// 2. РџРѕРёСЃРє Р¤Р°РєС‚Р° РІ СѓР¶Рµ РґРѕР±Р°РІР»РµРЅРЅС‹С… СЂР°РЅРµРµ.
+// 3. Р”РѕР±Р°РІР»РµРЅРёРµ Р¤Р°РєС‚Р° Рё РўРѕС‡РµРєР”Р°РЅРЅС‹С….
+//                    Р—РЅР°С‡РµРЅРёРµ Р¤Р°РєС‚Р°     РќР°Р·РІР°РЅРёРµ РњРµС‚СЂРёРєРё               РЎРїРёСЃРѕРє РїРѕР·РёС†РёР№ РІ РР·РјРµСЂРµРЅРёСЏС…
 int8_t Cube::add_Fact(double a_value, const std::string& a_measure, const std::vector<std::string>& a_positions_list) {
 	for (std::vector<Measure*>::iterator it_measure = m_measures.begin(); it_measure != m_measures.end(); it_measure++) {
-		// Проверка, соответсвует ли Метрика указанной
+		// РџСЂРѕРІРµСЂРєР°, СЃРѕРѕС‚РІРµС‚СЃРІСѓРµС‚ Р»Рё РњРµС‚СЂРёРєР° СѓРєР°Р·Р°РЅРЅРѕР№
 		if ((*it_measure)->get_name() == a_measure) {
-			// Поиск в уже добавленных ранее Фактах, очень медленно на больших массивах
+			// РџРѕРёСЃРє РІ СѓР¶Рµ РґРѕР±Р°РІР»РµРЅРЅС‹С… СЂР°РЅРµРµ Р¤Р°РєС‚Р°С…, РѕС‡РµРЅСЊ РјРµРґР»РµРЅРЅРѕ РЅР° Р±РѕР»СЊС€РёС… РјР°СЃСЃРёРІР°С…
 			std::vector<std::string>::const_iterator it_list = a_positions_list.begin();
-			// Блок 1 : Проверка уникальности позиций в Измерениях, если есть уникальная, второй, более медленный, блок пропускается
+			// Р‘Р»РѕРє 1 : РџСЂРѕРІРµСЂРєР° СѓРЅРёРєР°Р»СЊРЅРѕСЃС‚Рё РїРѕР·РёС†РёР№ РІ РР·РјРµСЂРµРЅРёСЏС…, РµСЃР»Рё РµСЃС‚СЊ СѓРЅРёРєР°Р»СЊРЅР°СЏ, РІС‚РѕСЂРѕР№, Р±РѕР»РµРµ РјРµРґР»РµРЅРЅС‹Р№, Р±Р»РѕРє РїСЂРѕРїСѓСЃРєР°РµС‚СЃСЏ
 			for (std::vector<Dimension*>::iterator it_dim = m_dims.begin(); it_dim != m_dims.end(); it_dim++) {
 				if (!(*it_dim)->search_mark(*it_list)) {
 					it_list = a_positions_list.end();
@@ -64,7 +64,7 @@ int8_t Cube::add_Fact(double a_value, const std::string& a_measure, const std::v
 				if (it_dim == m_dims.end()-1)
 					it_list = a_positions_list.begin();
 			}
-			// Блок 2 : Поиск среди всех Фактов
+			// Р‘Р»РѕРє 2 : РџРѕРёСЃРє СЃСЂРµРґРё РІСЃРµС… Р¤Р°РєС‚РѕРІ
 			if (it_list == a_positions_list.begin()) {
 				for (std::vector<Fact*>::iterator it_fact = m_facts.begin(); it_fact != m_facts.end(); it_fact++) {
 					it_list = a_positions_list.begin();
@@ -81,7 +81,7 @@ int8_t Cube::add_Fact(double a_value, const std::string& a_measure, const std::v
 					}
 				}
 			}
-			// Добавление Факта и ТочекДанных
+			// Р”РѕР±Р°РІР»РµРЅРёРµ Р¤Р°РєС‚Р° Рё РўРѕС‡РµРєР”Р°РЅРЅС‹С…
 			m_facts.push_back(new Fact(a_value, *it_measure));
 			it_list = a_positions_list.begin();
 			for (std::vector<Dimension*>::iterator it_dim = m_dims.begin(); it_dim != m_dims.end(); it_dim++) {
@@ -94,9 +94,9 @@ int8_t Cube::add_Fact(double a_value, const std::string& a_measure, const std::v
 	return UNKNOWN_MEASURE;
 }
 
-// Очистка Куба
+// РћС‡РёСЃС‚РєР° РљСѓР±Р°
 void Cube::clean() {
-	// Если Выборка удалена/не существует
+	// Р•СЃР»Рё Р’С‹Р±РѕСЂРєР° СѓРґР°Р»РµРЅР°/РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚
 	if(m_selection != nullptr)
 		m_selection->clean();
 	clean_vector(m_facts);
@@ -109,7 +109,7 @@ Cube::~Cube() {
 	clean();
 }
 
-// Очистка вектора указателей
+// РћС‡РёСЃС‚РєР° РІРµРєС‚РѕСЂР° СѓРєР°Р·Р°С‚РµР»РµР№
 template <class T>
 void Cube::clean_vector(std::vector<T*>& a_vector) {
 	for (class std::vector<T*>::iterator it = a_vector.begin(); it != a_vector.end(); it++) {

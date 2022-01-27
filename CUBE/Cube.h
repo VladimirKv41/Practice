@@ -8,7 +8,7 @@ class Measure;
 class DataPoint;
 class Selection;
 
-// Куб
+// РљСѓР±
 class Cube{
 public:
 
@@ -16,31 +16,31 @@ public:
 
 	Cube();
 
-	// добавление Измерения
+	// РґРѕР±Р°РІР»РµРЅРёРµ РР·РјРµСЂРµРЅРёСЏ
 	bool add_Dimension(const std::string& a_dim_name);
 
-	// добавление Метрика
+	// РґРѕР±Р°РІР»РµРЅРёРµ РњРµС‚СЂРёРєР°
 	bool add_Measure(const std::string& a_measure_name);
 
-	// Добавление Факта
+	// Р”РѕР±Р°РІР»РµРЅРёРµ Р¤Р°РєС‚Р°
 	int8_t add_Fact(double a_value, const std::string& a_measure, const std::vector<std::string>& a_positions_list);
 
-    // Очистка Куба
+    // РћС‡РёСЃС‚РєР° РљСѓР±Р°
 	void clean();
 	
 	~Cube();
 
 private:
 
-	// Очистка вектора указателей
+	// РћС‡РёСЃС‚РєР° РІРµРєС‚РѕСЂР° СѓРєР°Р·Р°С‚РµР»РµР№
 	template <class T>
 	void clean_vector(std::vector<T*>& a_vector);
 
-	// Вектора Фактов/Измерений/Метрик/ТочекДанных Куба
+	// Р’РµРєС‚РѕСЂР° Р¤Р°РєС‚РѕРІ/РР·РјРµСЂРµРЅРёР№/РњРµС‚СЂРёРє/РўРѕС‡РµРєР”Р°РЅРЅС‹С… РљСѓР±Р°
 	std::vector<Fact*> m_facts;
 	std::vector<Dimension*> m_dims;
 	std::vector<Measure*> m_measures;
 	std::vector<DataPoint*> m_points;
-	// Связанная Выборка
+	// РЎРІСЏР·Р°РЅРЅР°СЏ Р’С‹Р±РѕСЂРєР°
 	Selection* m_selection;
 };

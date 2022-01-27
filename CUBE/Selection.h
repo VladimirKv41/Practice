@@ -14,43 +14,43 @@ enum class agg_type {
 	AVERAGE
 };
 
-// Выборка
+// Р’С‹Р±РѕСЂРєР°
 class Selection {
 public:
 
 	Selection(Cube* a_cube);
 
-	// Создание выборки
+	// РЎРѕР·РґР°РЅРёРµ РІС‹Р±РѕСЂРєРё
 	int8_t make(const std::string& a_dim_name, const std::vector<std::string>& a_positions_list, const std::vector<std::string>& a_measure_list = {});
 
-	// Выбор агрегации
+	// Р’С‹Р±РѕСЂ Р°РіСЂРµРіР°С†РёРё
 	bool aggregation(agg_type a_agg_type,const std::string& a_dimension_name, const std::vector<std::string>& a_measure_list = {});
 
-	// Вывод Выборки
+	// Р’С‹РІРѕРґ Р’С‹Р±РѕСЂРєРё
 	void print() const;
 
-	// Очистка Выборки
+	// РћС‡РёСЃС‚РєР° Р’С‹Р±РѕСЂРєРё
 	void clean();
 
 	~Selection();
 
 private:
 
-	// Агрегация - суммирование
+	// РђРіСЂРµРіР°С†РёСЏ - СЃСѓРјРјРёСЂРѕРІР°РЅРёРµ
 	void count(const std::string& a_dimension_name, const std::vector<std::string>& a_measure_list);
-	// Агрегация - количество
+	// РђРіСЂРµРіР°С†РёСЏ - РєРѕР»РёС‡РµСЃС‚РІРѕ
 	void sum(const std::string& a_dimension_name, const std::vector<std::string>& a_measure_list);
-	// Агрегация - среднее значение
+	// РђРіСЂРµРіР°С†РёСЏ - СЃСЂРµРґРЅРµРµ Р·РЅР°С‡РµРЅРёРµ
 	void average(const std::string& a_dimension_name, const std::vector<std::string>& a_measure_list);
 
-	// ТочкиДанных Куба, из которых состоит выборка
+	// РўРѕС‡РєРёР”Р°РЅРЅС‹С… РљСѓР±Р°, РёР· РєРѕС‚РѕСЂС‹С… СЃРѕСЃС‚РѕРёС‚ РІС‹Р±РѕСЂРєР°
 	std::vector<DataPoint*> m_selection_points;
-	// ТочкиДанных/Факты/Метрики, созданные на основе агрегации
+	// РўРѕС‡РєРёР”Р°РЅРЅС‹С…/Р¤Р°РєС‚С‹/РњРµС‚СЂРёРєРё, СЃРѕР·РґР°РЅРЅС‹Рµ РЅР° РѕСЃРЅРѕРІРµ Р°РіСЂРµРіР°С†РёРё
 	std::vector<DataPoint*> m_aggregation_points;
 	std::vector<Fact*> m_aggregation_facts;
 	std::vector<Measure*> m_aggregation_measures;
-	// Измерение для агрегаций
+	// РР·РјРµСЂРµРЅРёРµ РґР»СЏ Р°РіСЂРµРіР°С†РёР№
 	Dimension* m_aggregation_dim;
-	// Связанный Куб для создания Выборки
+	// РЎРІСЏР·Р°РЅРЅС‹Р№ РљСѓР± РґР»СЏ СЃРѕР·РґР°РЅРёСЏ Р’С‹Р±РѕСЂРєРё
 	Cube* m_cube;
 };

@@ -16,38 +16,38 @@ enum make_result {
 
 
 
-Selection::Selection(Cube* a_cube): m_cube(a_cube), m_aggregation_dim(new Dimension("Агрегации")) {
+Selection::Selection(Cube* a_cube): m_cube(a_cube), m_aggregation_dim(new Dimension("РђРіСЂРµРіР°С†РёРё")) {
 	m_cube->m_selection = this;
 }
 
-// Создание выборки
-// 1. Итерация по Измерениям, Выборка создается только на основе указанного измерения
-// 2. Создается вектор из ТочекДанных, на основе которых составляется Выборка.
-// 3. Итерация по ТочкамДанных из вектора, если позиция в Измерении и Метрика совпадают с указанными,
-// то в Выборку добавляются все ТочкиДанных, связанные с тем же Фактом.
-// 4. Возврат значения, в зависимости от результата.
-//                           Название Измерения          Список позиций в Измерении                             Список Метрик
+// РЎРѕР·РґР°РЅРёРµ РІС‹Р±РѕСЂРєРё
+// 1. РС‚РµСЂР°С†РёСЏ РїРѕ РР·РјРµСЂРµРЅРёСЏРј, Р’С‹Р±РѕСЂРєР° СЃРѕР·РґР°РµС‚СЃСЏ С‚РѕР»СЊРєРѕ РЅР° РѕСЃРЅРѕРІРµ СѓРєР°Р·Р°РЅРЅРѕРіРѕ РёР·РјРµСЂРµРЅРёСЏ
+// 2. РЎРѕР·РґР°РµС‚СЃСЏ РІРµРєС‚РѕСЂ РёР· РўРѕС‡РµРєР”Р°РЅРЅС‹С…, РЅР° РѕСЃРЅРѕРІРµ РєРѕС‚РѕСЂС‹С… СЃРѕСЃС‚Р°РІР»СЏРµС‚СЃСЏ Р’С‹Р±РѕСЂРєР°.
+// 3. РС‚РµСЂР°С†РёСЏ РїРѕ РўРѕС‡РєР°РјР”Р°РЅРЅС‹С… РёР· РІРµРєС‚РѕСЂР°, РµСЃР»Рё РїРѕР·РёС†РёСЏ РІ РР·РјРµСЂРµРЅРёРё Рё РњРµС‚СЂРёРєР° СЃРѕРІРїР°РґР°СЋС‚ СЃ СѓРєР°Р·Р°РЅРЅС‹РјРё,
+// С‚Рѕ РІ Р’С‹Р±РѕСЂРєСѓ РґРѕР±Р°РІР»СЏСЋС‚СЃСЏ РІСЃРµ РўРѕС‡РєРёР”Р°РЅРЅС‹С…, СЃРІСЏР·Р°РЅРЅС‹Рµ СЃ С‚РµРј Р¶Рµ Р¤Р°РєС‚РѕРј.
+// 4. Р’РѕР·РІСЂР°С‚ Р·РЅР°С‡РµРЅРёСЏ, РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ СЂРµР·СѓР»СЊС‚Р°С‚Р°.
+//                           РќР°Р·РІР°РЅРёРµ РР·РјРµСЂРµРЅРёСЏ          РЎРїРёСЃРѕРє РїРѕР·РёС†РёР№ РІ РР·РјРµСЂРµРЅРёРё                             РЎРїРёСЃРѕРє РњРµС‚СЂРёРє
 int8_t Selection::make(const std::string& a_dim_name, const std::vector<std::string>& a_positions_list, const std::vector<std::string>& a_measure_list) {
-	// Проверка, существует ли куб
+	// РџСЂРѕРІРµСЂРєР°, СЃСѓС‰РµСЃС‚РІСѓРµС‚ Р»Рё РєСѓР±
 	if (m_aggregation_dim == nullptr)
 		return CUBE_DELETED;
 	for (std::vector<Dimension*>::const_iterator it_dim = m_cube->m_dims.begin(); it_dim != m_cube->m_dims.end(); it_dim++) {
-		// Проверка, совпадает ли измерение с указанным
+		// РџСЂРѕРІРµСЂРєР°, СЃРѕРІРїР°РґР°РµС‚ Р»Рё РёР·РјРµСЂРµРЅРёРµ СЃ СѓРєР°Р·Р°РЅРЅС‹Рј
 		if ((*it_dim)->get_name() == a_dim_name) {
 			std::vector<DataPoint*> dpoint_vector;
-			// Если Выборка уже заполнена, то новая Выборка составляется из уже имеющихся ТочекДанных
+			// Р•СЃР»Рё Р’С‹Р±РѕСЂРєР° СѓР¶Рµ Р·Р°РїРѕР»РЅРµРЅР°, С‚Рѕ РЅРѕРІР°СЏ Р’С‹Р±РѕСЂРєР° СЃРѕСЃС‚Р°РІР»СЏРµС‚СЃСЏ РёР· СѓР¶Рµ РёРјРµСЋС‰РёС…СЃСЏ РўРѕС‡РµРєР”Р°РЅРЅС‹С…
 			if (m_selection_points.size()) {
 				dpoint_vector = m_selection_points;
 				m_selection_points.clear();
 			}
-			// Если не заполнена, то берутся все ТочкиДанных указанного измерения
+			// Р•СЃР»Рё РЅРµ Р·Р°РїРѕР»РЅРµРЅР°, С‚Рѕ Р±РµСЂСѓС‚СЃСЏ РІСЃРµ РўРѕС‡РєРёР”Р°РЅРЅС‹С… СѓРєР°Р·Р°РЅРЅРѕРіРѕ РёР·РјРµСЂРµРЅРёСЏ
 			else
 				dpoint_vector = (*it_dim)->get_DataPoints();
-			// Итерация по ТочкамДанных из вектора
+			// РС‚РµСЂР°С†РёСЏ РїРѕ РўРѕС‡РєР°РјР”Р°РЅРЅС‹С… РёР· РІРµРєС‚РѕСЂР°
 			for (std::vector<DataPoint*>::const_iterator it_dpoint = dpoint_vector.begin(); it_dpoint != dpoint_vector.end(); it_dpoint++) {
 				for (std::vector<std::string>::const_iterator it_list = a_positions_list.begin(); it_list != a_positions_list.end(); it_list++) {
 					if ((*it_dpoint)->get_dim_position_name() == (*it_list)) {
-						// Если Метрики не указаны, то добавляются все ТочкиДанных
+						// Р•СЃР»Рё РњРµС‚СЂРёРєРё РЅРµ СѓРєР°Р·Р°РЅС‹, С‚Рѕ РґРѕР±Р°РІР»СЏСЋС‚СЃСЏ РІСЃРµ РўРѕС‡РєРёР”Р°РЅРЅС‹С…
 						if (!a_measure_list.size() || std::find(a_measure_list.begin(), a_measure_list.end(), (*it_dpoint)->get_Fact()->get_Measure_name()) != a_measure_list.end()) {
 							m_selection_points.insert(std::end(m_selection_points), std::begin((*it_dpoint)->get_Fact()->get_DataPoints()), std::end((*it_dpoint)->get_Fact()->get_DataPoints()));
 							break;
@@ -64,8 +64,8 @@ int8_t Selection::make(const std::string& a_dim_name, const std::vector<std::str
 	return UNKNOWN_DIMENSION;
 }
 
-// Выбор агрегации
-//                            Тип агрегации       Название измерения                       Список Метрик
+// Р’С‹Р±РѕСЂ Р°РіСЂРµРіР°С†РёРё
+//                            РўРёРї Р°РіСЂРµРіР°С†РёРё       РќР°Р·РІР°РЅРёРµ РёР·РјРµСЂРµРЅРёСЏ                       РЎРїРёСЃРѕРє РњРµС‚СЂРёРє
 bool Selection::aggregation(agg_type a_agg_type, const std::string& a_dimension_name, const std::vector<std::string>& a_measure_list) {
 	switch (a_agg_type) {
 		case agg_type::COUNT:
@@ -82,10 +82,10 @@ bool Selection::aggregation(agg_type a_agg_type, const std::string& a_dimension_
 	}
 }
 
-// Вывод Выборки
+// Р’С‹РІРѕРґ Р’С‹Р±РѕСЂРєРё
 void Selection::print() const {
 	uint32_t counter = 0;
-	// Вывод ТочекДанных на основе Куба
+	// Р’С‹РІРѕРґ РўРѕС‡РµРєР”Р°РЅРЅС‹С… РЅР° РѕСЃРЅРѕРІРµ РљСѓР±Р°
 	for (std::vector<DataPoint*>::const_iterator it_dpoint = m_selection_points.begin(); it_dpoint != m_selection_points.end(); it_dpoint++) {
 		std::cout << (*it_dpoint)->get_dim_position_name() << " | ";
 		counter++;
@@ -95,7 +95,7 @@ void Selection::print() const {
 		}
 	}
 	counter = 0;
-	// Вывод ТочекДанных на основе Аггрегации
+	// Р’С‹РІРѕРґ РўРѕС‡РµРєР”Р°РЅРЅС‹С… РЅР° РѕСЃРЅРѕРІРµ РђРіРіСЂРµРіР°С†РёРё
 	for (std::vector<DataPoint*>::const_iterator it_dpoint = m_aggregation_points.begin(); it_dpoint != m_aggregation_points.end(); it_dpoint++) {
 		std::cout << (*it_dpoint)->get_dim_position_name() << " | ";
 		if (counter == m_cube->m_dims.size()-1) {
@@ -108,7 +108,7 @@ void Selection::print() const {
 	std::cout << std::endl;
 }
 
-// Очистка Выборки
+// РћС‡РёСЃС‚РєР° Р’С‹Р±РѕСЂРєРё
 void Selection::clean() {
 	if (m_aggregation_dim != nullptr) {
 		delete m_aggregation_dim;
@@ -122,45 +122,45 @@ void Selection::clean() {
 
 Selection::~Selection() {
 	clean();
-	// Сообщение кубу, что Выборка больше не существует
+	// РЎРѕРѕР±С‰РµРЅРёРµ РєСѓР±Сѓ, С‡С‚Рѕ Р’С‹Р±РѕСЂРєР° Р±РѕР»СЊС€Рµ РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚
 	m_cube->m_selection = nullptr;
 }
 
-// Агрегация - количество
-// 1. Итерация по Метрикам, агрегируются только указанные, если не указаны, то по всем.
-// 2. Создание ассоциативного контейнера(map): ключ - вектор из чисел, где число - индекс позиции в Измерении; значение - количество.
-// 3. Итерация по ТочкамДанных выборки и заполнение map-контейнера.
-// 4. Итерация по полученному map-контейнеру и создание новых ТочекДанных и Фактов к ним.
-//                                    Название Измерения                        Список Метрик
+// РђРіСЂРµРіР°С†РёСЏ - РєРѕР»РёС‡РµСЃС‚РІРѕ
+// 1. РС‚РµСЂР°С†РёСЏ РїРѕ РњРµС‚СЂРёРєР°Рј, Р°РіСЂРµРіРёСЂСѓСЋС‚СЃСЏ С‚РѕР»СЊРєРѕ СѓРєР°Р·Р°РЅРЅС‹Рµ, РµСЃР»Рё РЅРµ СѓРєР°Р·Р°РЅС‹, С‚Рѕ РїРѕ РІСЃРµРј.
+// 2. РЎРѕР·РґР°РЅРёРµ Р°СЃСЃРѕС†РёР°С‚РёРІРЅРѕРіРѕ РєРѕРЅС‚РµР№РЅРµСЂР°(map): РєР»СЋС‡ - РІРµРєС‚РѕСЂ РёР· С‡РёСЃРµР», РіРґРµ С‡РёСЃР»Рѕ - РёРЅРґРµРєСЃ РїРѕР·РёС†РёРё РІ РР·РјРµСЂРµРЅРёРё; Р·РЅР°С‡РµРЅРёРµ - РєРѕР»РёС‡РµСЃС‚РІРѕ.
+// 3. РС‚РµСЂР°С†РёСЏ РїРѕ РўРѕС‡РєР°РјР”Р°РЅРЅС‹С… РІС‹Р±РѕСЂРєРё Рё Р·Р°РїРѕР»РЅРµРЅРёРµ map-РєРѕРЅС‚РµР№РЅРµСЂР°.
+// 4. РС‚РµСЂР°С†РёСЏ РїРѕ РїРѕР»СѓС‡РµРЅРЅРѕРјСѓ map-РєРѕРЅС‚РµР№РЅРµСЂСѓ Рё СЃРѕР·РґР°РЅРёРµ РЅРѕРІС‹С… РўРѕС‡РµРєР”Р°РЅРЅС‹С… Рё Р¤Р°РєС‚РѕРІ Рє РЅРёРј.
+//                                    РќР°Р·РІР°РЅРёРµ РР·РјРµСЂРµРЅРёСЏ                        РЎРїРёСЃРѕРє РњРµС‚СЂРёРє
 void Selection::count(const std::string& a_dimension_name, const std::vector<std::string>& a_measure_list) {
 	for (std::vector<Measure*>::const_iterator it_measure = m_cube->m_measures.begin(); it_measure != m_cube->m_measures.end(); it_measure++) {
-		// Проверка, указана ли данная Метрика
+		// РџСЂРѕРІРµСЂРєР°, СѓРєР°Р·Р°РЅР° Р»Рё РґР°РЅРЅР°СЏ РњРµС‚СЂРёРєР°
 		if (!a_measure_list.size() || std::find(a_measure_list.begin(), a_measure_list.end(), (*it_measure)->get_name()) != a_measure_list.end()) {
 			uint8_t counter = 0;
-			// Размер вектора на 1 меньше количества измерений, т.к. к агрегируемому Измерению будут создаваться новые ТочкиДанных
+			// Р Р°Р·РјРµСЂ РІРµРєС‚РѕСЂР° РЅР° 1 РјРµРЅСЊС€Рµ РєРѕР»РёС‡РµСЃС‚РІР° РёР·РјРµСЂРµРЅРёР№, С‚.Рє. Рє Р°РіСЂРµРіРёСЂСѓРµРјРѕРјСѓ РР·РјРµСЂРµРЅРёСЋ Р±СѓРґСѓС‚ СЃРѕР·РґР°РІР°С‚СЊСЃСЏ РЅРѕРІС‹Рµ РўРѕС‡РєРёР”Р°РЅРЅС‹С…
 			std::vector<uint32_t> temp_vector(m_cube->m_dims.size() - 1);
 			std::map<std::vector<uint32_t>, uint32_t> temp_map;
-			// Заполнение map-контейнера
+			// Р—Р°РїРѕР»РЅРµРЅРёРµ map-РєРѕРЅС‚РµР№РЅРµСЂР°
 			for (std::vector<DataPoint*>::iterator it_dpoint = m_selection_points.begin(); it_dpoint != m_selection_points.end(); it_dpoint++) {
 				if ((*it_dpoint)->get_Fact()->get_Measure() == *it_measure) {
-					// Заполнение ключа-вектора
+					// Р—Р°РїРѕР»РЅРµРЅРёРµ РєР»СЋС‡Р°-РІРµРєС‚РѕСЂР°
 					if ((*it_dpoint)->get_Dimension()->get_name() != a_dimension_name) {
 						temp_vector.at(counter) = (*it_dpoint)->get_dim_position_index();
 						counter++;
 					}
-					// Подсчет количества
+					// РџРѕРґСЃС‡РµС‚ РєРѕР»РёС‡РµСЃС‚РІР°
 					if (counter == m_cube->m_dims.size() - 1) {
 						temp_map[temp_vector]++;
 						counter = 0;
 					}
 				}
 			}
-			// Получение индекса Метрики Количество
-			uint8_t meas_index = std::find_if(m_aggregation_measures.begin(), m_aggregation_measures.end(), [](const Measure* m) { return (m->get_name() == "Количество"); }) - m_aggregation_measures.begin();
+			// РџРѕР»СѓС‡РµРЅРёРµ РёРЅРґРµРєСЃР° РњРµС‚СЂРёРєРё РљРѕР»РёС‡РµСЃС‚РІРѕ
+			uint8_t meas_index = std::find_if(m_aggregation_measures.begin(), m_aggregation_measures.end(), [](const Measure* m) { return (m->get_name() == "РљРѕР»РёС‡РµСЃС‚РІРѕ"); }) - m_aggregation_measures.begin();
 			if (meas_index == m_aggregation_measures.size()) {
-				m_aggregation_measures.push_back(new Measure("Количество"));
+				m_aggregation_measures.push_back(new Measure("РљРѕР»РёС‡РµСЃС‚РІРѕ"));
 			}
-			// Cоздание Фактов и ТочекДанных
+			// CРѕР·РґР°РЅРёРµ Р¤Р°РєС‚РѕРІ Рё РўРѕС‡РµРєР”Р°РЅРЅС‹С…
 			for (std::map<std::vector<uint32_t>, uint32_t>::iterator it_map = temp_map.begin(); it_map != temp_map.end(); it_map++) {
 				m_aggregation_facts.push_back(new Fact(it_map->second, m_aggregation_measures.at(meas_index)));
 				counter = 0;
@@ -180,36 +180,36 @@ void Selection::count(const std::string& a_dimension_name, const std::vector<std
 	}
 };
 
-// Агрегация - суммирование
-// 1. Итерация по Метрикам, агрегируются только указанные, если не указаны, то по всем.
-// 2. Создание ассоциативного контейнера(map): ключ - вектор из чисел, где число - индекс позиции в Измерении; значение - сумма.
-// 3. Итерация по ТочкамДанных выборки и заполнение map-контейнера.
-// 4. Итерация по полученному map-контейнеру и создание новых ТочекДанных и Фактов к ним.
-//                                    Название Измерения                        Список Метрик
+// РђРіСЂРµРіР°С†РёСЏ - СЃСѓРјРјРёСЂРѕРІР°РЅРёРµ
+// 1. РС‚РµСЂР°С†РёСЏ РїРѕ РњРµС‚СЂРёРєР°Рј, Р°РіСЂРµРіРёСЂСѓСЋС‚СЃСЏ С‚РѕР»СЊРєРѕ СѓРєР°Р·Р°РЅРЅС‹Рµ, РµСЃР»Рё РЅРµ СѓРєР°Р·Р°РЅС‹, С‚Рѕ РїРѕ РІСЃРµРј.
+// 2. РЎРѕР·РґР°РЅРёРµ Р°СЃСЃРѕС†РёР°С‚РёРІРЅРѕРіРѕ РєРѕРЅС‚РµР№РЅРµСЂР°(map): РєР»СЋС‡ - РІРµРєС‚РѕСЂ РёР· С‡РёСЃРµР», РіРґРµ С‡РёСЃР»Рѕ - РёРЅРґРµРєСЃ РїРѕР·РёС†РёРё РІ РР·РјРµСЂРµРЅРёРё; Р·РЅР°С‡РµРЅРёРµ - СЃСѓРјРјР°.
+// 3. РС‚РµСЂР°С†РёСЏ РїРѕ РўРѕС‡РєР°РјР”Р°РЅРЅС‹С… РІС‹Р±РѕСЂРєРё Рё Р·Р°РїРѕР»РЅРµРЅРёРµ map-РєРѕРЅС‚РµР№РЅРµСЂР°.
+// 4. РС‚РµСЂР°С†РёСЏ РїРѕ РїРѕР»СѓС‡РµРЅРЅРѕРјСѓ map-РєРѕРЅС‚РµР№РЅРµСЂСѓ Рё СЃРѕР·РґР°РЅРёРµ РЅРѕРІС‹С… РўРѕС‡РµРєР”Р°РЅРЅС‹С… Рё Р¤Р°РєС‚РѕРІ Рє РЅРёРј.
+//                                    РќР°Р·РІР°РЅРёРµ РР·РјРµСЂРµРЅРёСЏ                        РЎРїРёСЃРѕРє РњРµС‚СЂРёРє
 void Selection::sum(const std::string& a_dimension_name, const std::vector<std::string>& a_measure_list) {
 	for (std::vector<Measure*>::const_iterator it_measure = m_cube->m_measures.begin(); it_measure != m_cube->m_measures.end(); it_measure++) {
-		// Проверка, указана ли данная Метрика
+		// РџСЂРѕРІРµСЂРєР°, СѓРєР°Р·Р°РЅР° Р»Рё РґР°РЅРЅР°СЏ РњРµС‚СЂРёРєР°
 		if (!a_measure_list.size() || std::find(a_measure_list.begin(), a_measure_list.end(), (*it_measure)->get_name()) != a_measure_list.end()) {
 			uint32_t counter = 0;
-			// Размер вектора на 1 меньше количества измерений, т.к. к агрегируемому Измерению будут создаваться новые ТочкиДанных
+			// Р Р°Р·РјРµСЂ РІРµРєС‚РѕСЂР° РЅР° 1 РјРµРЅСЊС€Рµ РєРѕР»РёС‡РµСЃС‚РІР° РёР·РјРµСЂРµРЅРёР№, С‚.Рє. Рє Р°РіСЂРµРіРёСЂСѓРµРјРѕРјСѓ РР·РјРµСЂРµРЅРёСЋ Р±СѓРґСѓС‚ СЃРѕР·РґР°РІР°С‚СЊСЃСЏ РЅРѕРІС‹Рµ РўРѕС‡РєРёР”Р°РЅРЅС‹С…
 			std::vector<uint32_t> temp_vector(m_cube->m_dims.size() - 1);
 			std::map<std::vector<uint32_t>, double> temp_map;
-			// Заполнение map-контейнера
+			// Р—Р°РїРѕР»РЅРµРЅРёРµ map-РєРѕРЅС‚РµР№РЅРµСЂР°
 			for (std::vector<DataPoint*>::iterator it_dpoint = m_selection_points.begin(); it_dpoint != m_selection_points.end(); it_dpoint++) {
 				if ((*it_dpoint)->get_Fact()->get_Measure() == *it_measure) {
-					// Заполнение ключа-вектора
+					// Р—Р°РїРѕР»РЅРµРЅРёРµ РєР»СЋС‡Р°-РІРµРєС‚РѕСЂР°
 					if ((*it_dpoint)->get_Dimension()->get_name() != a_dimension_name) {
 						temp_vector.at(counter) = (*it_dpoint)->get_dim_position_index();
 						counter++;
 					}
-					// Суммирование
+					// РЎСѓРјРјРёСЂРѕРІР°РЅРёРµ
 					if (counter == m_cube->m_dims.size() - 1) {
 						temp_map[temp_vector] += (*it_dpoint)->get_Fact()->get_value();
 						counter = 0;
 					}
 				}
 			}
-			// Cоздание Фактов и ТочекДанных
+			// CРѕР·РґР°РЅРёРµ Р¤Р°РєС‚РѕРІ Рё РўРѕС‡РµРєР”Р°РЅРЅС‹С…
 			for (std::map<std::vector<uint32_t>, double>::iterator it_map = temp_map.begin(); it_map != temp_map.end(); it_map++) {
 				m_aggregation_facts.push_back(new Fact(it_map->second, *it_measure));
 				counter = 0;
@@ -229,30 +229,30 @@ void Selection::sum(const std::string& a_dimension_name, const std::vector<std::
 	}
 };
 
-// Агрегация - среднее значение
-// 1. Итерация по Метрикам, агрегируются только указанные, если не указаны, то по всем.
-// 2. Создание ассоциативного контейнера(map): ключ - вектор из чисел, где число - индекс позиции в Измерении; значение - пара, где
-// первое число - сумма, второе - количество.
-// 3. Итерация по ТочкамДанных выборки и заполнение map-контейнера.
-// 4. Итерация по полученному map-контейнеру и создание новых ТочекДанных и Фактов к ним.
-//                                    Название Измерения                        Список Метрик
+// РђРіСЂРµРіР°С†РёСЏ - СЃСЂРµРґРЅРµРµ Р·РЅР°С‡РµРЅРёРµ
+// 1. РС‚РµСЂР°С†РёСЏ РїРѕ РњРµС‚СЂРёРєР°Рј, Р°РіСЂРµРіРёСЂСѓСЋС‚СЃСЏ С‚РѕР»СЊРєРѕ СѓРєР°Р·Р°РЅРЅС‹Рµ, РµСЃР»Рё РЅРµ СѓРєР°Р·Р°РЅС‹, С‚Рѕ РїРѕ РІСЃРµРј.
+// 2. РЎРѕР·РґР°РЅРёРµ Р°СЃСЃРѕС†РёР°С‚РёРІРЅРѕРіРѕ РєРѕРЅС‚РµР№РЅРµСЂР°(map): РєР»СЋС‡ - РІРµРєС‚РѕСЂ РёР· С‡РёСЃРµР», РіРґРµ С‡РёСЃР»Рѕ - РёРЅРґРµРєСЃ РїРѕР·РёС†РёРё РІ РР·РјРµСЂРµРЅРёРё; Р·РЅР°С‡РµРЅРёРµ - РїР°СЂР°, РіРґРµ
+// РїРµСЂРІРѕРµ С‡РёСЃР»Рѕ - СЃСѓРјРјР°, РІС‚РѕСЂРѕРµ - РєРѕР»РёС‡РµСЃС‚РІРѕ.
+// 3. РС‚РµСЂР°С†РёСЏ РїРѕ РўРѕС‡РєР°РјР”Р°РЅРЅС‹С… РІС‹Р±РѕСЂРєРё Рё Р·Р°РїРѕР»РЅРµРЅРёРµ map-РєРѕРЅС‚РµР№РЅРµСЂР°.
+// 4. РС‚РµСЂР°С†РёСЏ РїРѕ РїРѕР»СѓС‡РµРЅРЅРѕРјСѓ map-РєРѕРЅС‚РµР№РЅРµСЂСѓ Рё СЃРѕР·РґР°РЅРёРµ РЅРѕРІС‹С… РўРѕС‡РµРєР”Р°РЅРЅС‹С… Рё Р¤Р°РєС‚РѕРІ Рє РЅРёРј.
+//                                    РќР°Р·РІР°РЅРёРµ РР·РјРµСЂРµРЅРёСЏ                        РЎРїРёСЃРѕРє РњРµС‚СЂРёРє
 void Selection::average(const std::string& a_dimension_name, const std::vector<std::string>& a_measure_list) {
 	for (std::vector<Measure*>::const_iterator it_measure = m_cube->m_measures.begin(); it_measure != m_cube->m_measures.end(); it_measure++) {
-		// Проверка, указана ли данная Метрика
+		// РџСЂРѕРІРµСЂРєР°, СѓРєР°Р·Р°РЅР° Р»Рё РґР°РЅРЅР°СЏ РњРµС‚СЂРёРєР°
 		if (!a_measure_list.size() || std::find(a_measure_list.begin(), a_measure_list.end(), (*it_measure)->get_name()) != a_measure_list.end()) {
 			uint32_t counter = 0;
-			// Размер вектора на 1 меньше количества измерений, т.к. к агрегируемому Измерению будут создаваться новые ТочкиДанных
+			// Р Р°Р·РјРµСЂ РІРµРєС‚РѕСЂР° РЅР° 1 РјРµРЅСЊС€Рµ РєРѕР»РёС‡РµСЃС‚РІР° РёР·РјРµСЂРµРЅРёР№, С‚.Рє. Рє Р°РіСЂРµРіРёСЂСѓРµРјРѕРјСѓ РР·РјРµСЂРµРЅРёСЋ Р±СѓРґСѓС‚ СЃРѕР·РґР°РІР°С‚СЊСЃСЏ РЅРѕРІС‹Рµ РўРѕС‡РєРёР”Р°РЅРЅС‹С…
 			std::vector<uint32_t> temp_vector(m_cube->m_dims.size() - 1);
 			std::map<std::vector<uint32_t>, std::pair<double, uint32_t>> temp_map;
-			// Заполнение map-контейнера
+			// Р—Р°РїРѕР»РЅРµРЅРёРµ map-РєРѕРЅС‚РµР№РЅРµСЂР°
 			for (std::vector<DataPoint*>::iterator it_dpoint = m_selection_points.begin(); it_dpoint != m_selection_points.end(); it_dpoint++) {
 				if ((*it_dpoint)->get_Fact()->get_Measure() == *it_measure) {
-					// Заполнение ключа-вектора
+					// Р—Р°РїРѕР»РЅРµРЅРёРµ РєР»СЋС‡Р°-РІРµРєС‚РѕСЂР°
 					if ((*it_dpoint)->get_Dimension()->get_name() != a_dimension_name) {
 						temp_vector.at(counter) = (*it_dpoint)->get_dim_position_index();
 						counter++;
 					}
-					// Суммирование и подсчет количества
+					// РЎСѓРјРјРёСЂРѕРІР°РЅРёРµ Рё РїРѕРґСЃС‡РµС‚ РєРѕР»РёС‡РµСЃС‚РІР°
 					if (counter == m_cube->m_dims.size() - 1) {
 						temp_map[temp_vector].first += (*it_dpoint)->get_Fact()->get_value();
 						temp_map[temp_vector].second++;
@@ -260,7 +260,7 @@ void Selection::average(const std::string& a_dimension_name, const std::vector<s
 					}
 				}
 			}
-			// Cоздание Фактов и ТочекДанных
+			// CРѕР·РґР°РЅРёРµ Р¤Р°РєС‚РѕРІ Рё РўРѕС‡РµРєР”Р°РЅРЅС‹С…
 			for (std::map<std::vector<uint32_t>, std::pair<double, uint32_t>>::iterator it_map = temp_map.begin(); it_map != temp_map.end(); it_map++) {
 				m_aggregation_facts.push_back(new Fact(it_map->second.first / it_map->second.second, *it_measure));
 				counter = 0;

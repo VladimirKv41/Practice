@@ -4,7 +4,7 @@ Measure::Measure(const std::string& a_name) : m_name(a_name) {
 	
 }
 
-// Получение название Метрики
+// РџРѕР»СѓС‡РµРЅРёРµ РЅР°Р·РІР°РЅРёРµ РњРµС‚СЂРёРєРё
 const std::string& Measure::get_name() const {
 	return m_name;
 }

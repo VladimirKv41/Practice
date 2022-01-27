@@ -3,27 +3,27 @@
 #include "Dimension.h"
 
 DataPoint::DataPoint(Fact* a_fact, Dimension* a_dim, uint32_t a_position_index) : m_fact(a_fact), m_dim(a_dim), m_position_index(a_position_index) {
-	// Даём ссылку на эту ТочкуДанных Факту и Измерению, связанным с этой ТочкойДанных
+	// Р”Р°С‘Рј СЃСЃС‹Р»РєСѓ РЅР° СЌС‚Сѓ РўРѕС‡РєСѓР”Р°РЅРЅС‹С… Р¤Р°РєС‚Сѓ Рё РР·РјРµСЂРµРЅРёСЋ, СЃРІСЏР·Р°РЅРЅС‹Рј СЃ СЌС‚РѕР№ РўРѕС‡РєРѕР№Р”Р°РЅРЅС‹С…
 	m_fact->push_DataPoint(this);
 	m_dim->push_DataPoint(this);
 }	
 
-// Получение Измерения
+// РџРѕР»СѓС‡РµРЅРёРµ РР·РјРµСЂРµРЅРёСЏ
 const Dimension* const DataPoint::get_Dimension() const {
 	return m_dim;
 }
 
-// Получение Факта
+// РџРѕР»СѓС‡РµРЅРёРµ Р¤Р°РєС‚Р°
 const Fact* const DataPoint::get_Fact() const {
 	return m_fact;
 }
 
-// Получение позиции в связанном Измерении
+// РџРѕР»СѓС‡РµРЅРёРµ РїРѕР·РёС†РёРё РІ СЃРІСЏР·Р°РЅРЅРѕРј РР·РјРµСЂРµРЅРёРё
 const std::string& DataPoint::get_dim_position_name() const {
 	return m_dim->get_positions().at(m_position_index);
 }
 
-// Получение индекса позиции в связанном Измерении
+// РџРѕР»СѓС‡РµРЅРёРµ РёРЅРґРµРєСЃР° РїРѕР·РёС†РёРё РІ СЃРІСЏР·Р°РЅРЅРѕРј РР·РјРµСЂРµРЅРёРё
 uint32_t DataPoint::get_dim_position_index() const {
 	return m_position_index;
 }

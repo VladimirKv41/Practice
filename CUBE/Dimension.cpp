@@ -4,20 +4,20 @@ Dimension::Dimension(const std::string &a_name) : m_name(a_name) {
 	
 }
 
-// Добавление связанной ТочкиДанных
+// Р”РѕР±Р°РІР»РµРЅРёРµ СЃРІСЏР·Р°РЅРЅРѕР№ РўРѕС‡РєРёР”Р°РЅРЅС‹С…
 void Dimension::push_DataPoint(DataPoint* a_point) {
 	m_points.push_back(a_point);
 }
 
-// Получение вектора связанных ТочекДанных
+// РџРѕР»СѓС‡РµРЅРёРµ РІРµРєС‚РѕСЂР° СЃРІСЏР·Р°РЅРЅС‹С… РўРѕС‡РµРєР”Р°РЅРЅС‹С…
 const std::vector<DataPoint*>& Dimension::get_DataPoints() const {
 	return m_points;
 }
 
-// Получение индекса позиции в Измерении
-//                                   Позиция
+// РџРѕР»СѓС‡РµРЅРёРµ РёРЅРґРµРєСЃР° РїРѕР·РёС†РёРё РІ РР·РјРµСЂРµРЅРёРё
+//                                   РџРѕР·РёС†РёСЏ
 uint32_t Dimension::get_mark(const std::string &a_mark) {
-	// Если позиция не существует, то сначала создаётся
+	// Р•СЃР»Рё РїРѕР·РёС†РёСЏ РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚, С‚Рѕ СЃРЅР°С‡Р°Р»Р° СЃРѕР·РґР°С‘С‚СЃСЏ
 	if (std::find(m_vector.begin(), m_vector.end(), a_mark) == m_vector.end()) {
 		m_vector.push_back(a_mark);
 		return m_vector.end() - m_vector.begin() - 1;
@@ -26,7 +26,7 @@ uint32_t Dimension::get_mark(const std::string &a_mark) {
 		return std::find(m_vector.begin(), m_vector.end(), a_mark) - m_vector.begin();
 }
 
-// Поиск позиции в Измерении
+// РџРѕРёСЃРє РїРѕР·РёС†РёРё РІ РР·РјРµСЂРµРЅРёРё
 bool Dimension::search_mark(const std::string &a_mark) const {
 	if (std::find(m_vector.begin(), m_vector.end(), a_mark) == m_vector.end()) {
 		return false;
@@ -35,12 +35,12 @@ bool Dimension::search_mark(const std::string &a_mark) const {
 		return true;
 }
 
-// Получение названия Измерения
+// РџРѕР»СѓС‡РµРЅРёРµ РЅР°Р·РІР°РЅРёСЏ РР·РјРµСЂРµРЅРёСЏ
 const std::string& Dimension::get_name() const {
 	return m_name;
 }
 
-// Получение вектора позиций Измерения
+// РџРѕР»СѓС‡РµРЅРёРµ РІРµРєС‚РѕСЂР° РїРѕР·РёС†РёР№ РР·РјРµСЂРµРЅРёСЏ
 const std::vector<std::string>& Dimension::get_positions() const {
 	return m_vector;
 }
