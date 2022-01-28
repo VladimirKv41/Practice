@@ -1,4 +1,4 @@
-#include "Selection.h"
+﻿#include "Selection.h"
 #include "DataPoint.h"
 #include "Cube.h"
 #include "Dimension.h"
@@ -7,30 +7,16 @@
 #include <iostream>
 #include <map>
 
-enum make_result {
-	CUBE_DELETED = -2,
-	UNKNOWN_DIMENSION,
-	FACT_NOT_FOUND,
-	ADDED
-};
-
-
 
 Selection::Selection(Cube* a_cube): m_cube(a_cube), m_aggregation_dim(new Dimension("Агрегации")) {
 	m_cube->m_selection = this;
 }
 
-// Создание выборки
-// 1. Итерация по Измерениям, Выборка создается только на основе указанного измерения
-// 2. Создается вектор из ТочекДанных, на основе которых составляется Выборка.
-// 3. Итерация по ТочкамДанных из вектора, если позиция в Измерении и Метрика совпадают с указанными,
-// то в Выборку добавляются все ТочкиДанных, связанные с тем же Фактом.
-// 4. Возврат значения, в зависимости от результата.
-//                           Название Измерения          Список позиций в Измерении                             Список Метрик
-int8_t Selection::make(const std::string& a_dim_name, const std::vector<std::string>& a_positions_list, const std::vector<std::string>& a_measure_list) {
+
+make_result Selection::make(const std::string& a_dim_name, const std::vector<std::string>& a_positions_list, const std::vector<std::string>& a_measure_list) {
 	// Проверка, существует ли куб
 	if (m_aggregation_dim == nullptr)
-		return CUBE_DELETED;
+		return make_result::CUBE_DELETED;
 	for (std::vector<Dimension*>::const_iterator it_dim = m_cube->m_dims.begin(); it_dim != m_cube->m_dims.end(); it_dim++) {
 		// Проверка, совпадает ли измерение с указанным
 		if ((*it_dim)->get_name() == a_dim_name) {
@@ -56,16 +42,24 @@ int8_t Selection::make(const std::string& a_dim_name, const std::vector<std::str
 				}
 			}
 			if (m_selection_points.size())
-				return ADDED;
+				return make_result::CREATED;
 			else
-				return FACT_NOT_FOUND;
+				return make_result::NO_FACT_FOUND;
 		}
 	}
-	return UNKNOWN_DIMENSION;
+	return make_result::UNKNOWN_DIMENSION;
 }
 
-// Выбор агрегации
-//                            Тип агрегации       Название измерения                       Список Метрик
+/**
+ * @brief Выбор агрегации
+ * 
+ * Вызывает приватную функцию агрегации в зависимости от параметров
+ * 
+ * @param [in] a_agg_type Тип агрегации
+ * @param [in] a_dimension_name Название измерения
+ * @param [in] a_measure_list Список Метрик
+ * @return Найдена/вызвана ли функция или нет
+ */
 bool Selection::aggregation(agg_type a_agg_type, const std::string& a_dimension_name, const std::vector<std::string>& a_measure_list) {
 	switch (a_agg_type) {
 		case agg_type::COUNT:
@@ -82,7 +76,9 @@ bool Selection::aggregation(agg_type a_agg_type, const std::string& a_dimension_
 	}
 }
 
-// Вывод Выборки
+/**
+ * @brief Вывод Выборки
+ */
 void Selection::print() const {
 	uint32_t counter = 0;
 	// Вывод ТочекДанных на основе Куба
@@ -108,7 +104,12 @@ void Selection::print() const {
 	std::cout << std::endl;
 }
 
-// Очистка Выборки
+/**
+ * @brief Очистка Выборки
+ * 
+ * Сначала проверяется указатель на Измерение для аггрегаций, он служит флагом,
+ * Выборка уже очищена или нет
+ */
 void Selection::clean() {
 	if (m_aggregation_dim != nullptr) {
 		delete m_aggregation_dim;
@@ -120,18 +121,26 @@ void Selection::clean() {
 	}
 }
 
+/**
+ * @brief Деструктор
+ */
 Selection::~Selection() {
 	clean();
-	// Сообщение кубу, что Выборка больше не существует
+	// Сообщение кубу, что Выборка удалена
 	m_cube->m_selection = nullptr;
 }
 
-// Агрегация - количество
-// 1. Итерация по Метрикам, агрегируются только указанные, если не указаны, то по всем.
-// 2. Создание ассоциативного контейнера(map): ключ - вектор из чисел, где число - индекс позиции в Измерении; значение - количество.
-// 3. Итерация по ТочкамДанных выборки и заполнение map-контейнера.
-// 4. Итерация по полученному map-контейнеру и создание новых ТочекДанных и Фактов к ним.
-//                                    Название Измерения                        Список Метрик
+/**
+ * @brief Агрегация - количество
+ *
+ * 1. Итерация по Метрикам, агрегируются только указанные, если не указаны, то по всем.
+ * 2. Создание ассоциативного контейнера(map): ключ - вектор из чисел, где число - индекс позиции в Измерении; значение - количество.
+ * 3. Итерация по ТочкамДанных выборки и заполнение map-контейнера.
+ * 4. Итерация по полученному map-контейнеру и создание новых ТочекДанных и Фактов к ним.
+ *
+ * @param [in] a_dimension_name Название Измерения
+ * @param [in] a_measure_list Список Метрик
+ */
 void Selection::count(const std::string& a_dimension_name, const std::vector<std::string>& a_measure_list) {
 	for (std::vector<Measure*>::const_iterator it_measure = m_cube->m_measures.begin(); it_measure != m_cube->m_measures.end(); it_measure++) {
 		// Проверка, указана ли данная Метрика
@@ -180,12 +189,17 @@ void Selection::count(const std::string& a_dimension_name, const std::vector<std
 	}
 };
 
-// Агрегация - суммирование
-// 1. Итерация по Метрикам, агрегируются только указанные, если не указаны, то по всем.
-// 2. Создание ассоциативного контейнера(map): ключ - вектор из чисел, где число - индекс позиции в Измерении; значение - сумма.
-// 3. Итерация по ТочкамДанных выборки и заполнение map-контейнера.
-// 4. Итерация по полученному map-контейнеру и создание новых ТочекДанных и Фактов к ним.
-//                                    Название Измерения                        Список Метрик
+/**
+ * @brief Агрегация - суммирование
+ * 
+ * 1. Итерация по Метрикам, агрегируются только указанные, если не указаны, то по всем.
+ * 2. Создание ассоциативного контейнера(map): ключ - вектор из чисел, где число - индекс позиции в Измерении; значение - сумма.
+ * 3. Итерация по ТочкамДанных выборки и заполнение map-контейнера.
+ * 4. Итерация по полученному map-контейнеру и создание новых ТочекДанных и Фактов к ним.
+ * 
+ * @param [in] a_dimension_name Название Измерения
+ * @param [in] a_measure_list Список Метрик
+ */
 void Selection::sum(const std::string& a_dimension_name, const std::vector<std::string>& a_measure_list) {
 	for (std::vector<Measure*>::const_iterator it_measure = m_cube->m_measures.begin(); it_measure != m_cube->m_measures.end(); it_measure++) {
 		// Проверка, указана ли данная Метрика
@@ -229,13 +243,18 @@ void Selection::sum(const std::string& a_dimension_name, const std::vector<std::
 	}
 };
 
-// Агрегация - среднее значение
-// 1. Итерация по Метрикам, агрегируются только указанные, если не указаны, то по всем.
-// 2. Создание ассоциативного контейнера(map): ключ - вектор из чисел, где число - индекс позиции в Измерении; значение - пара, где
-// первое число - сумма, второе - количество.
-// 3. Итерация по ТочкамДанных выборки и заполнение map-контейнера.
-// 4. Итерация по полученному map-контейнеру и создание новых ТочекДанных и Фактов к ним.
-//                                    Название Измерения                        Список Метрик
+/**
+ * @brief Агрегация - среднее значение
+ * 
+ * 1. Итерация по Метрикам, агрегируются только указанные, если не указаны, то по всем.
+ * 2. Создание ассоциативного контейнера(map): ключ - вектор из чисел, где число - индекс позиции в Измерении; значение - пара, где
+ * первое число - сумма, второе - количество.
+ * 3. Итерация по ТочкамДанных выборки и заполнение map-контейнера.
+ * 4. Итерация по полученному map-контейнеру и создание новых ТочекДанных и Фактов к ним.
+ * 
+ * @param [in] a_dimension_name Название Измерения
+ * @param [in] a_measure_list Список Метрик
+ */
 void Selection::average(const std::string& a_dimension_name, const std::vector<std::string>& a_measure_list) {
 	for (std::vector<Measure*>::const_iterator it_measure = m_cube->m_measures.begin(); it_measure != m_cube->m_measures.end(); it_measure++) {
 		// Проверка, указана ли данная Метрика
