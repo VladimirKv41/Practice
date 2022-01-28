@@ -1,10 +1,15 @@
-#pragma once
+﻿#pragma once
 #include <string>
 #include <vector>
 
 class DataPoint;
 
 // Измерение
+/**
+ * @brief Измерение
+ * 
+ * Класс для хранения и работы с одной из "осей" Куба
+ */
 class Dimension {
 public:
 

@@ -7,12 +7,32 @@
 #include <iostream>
 #include <map>
 
-
+/**
+ * @brief Конструктор
+ * 
+ * 1. Инициализация Куба и Измерения для агрегации
+ * 2. Передача ссылки на данную Выборку Кубу
+ * 
+ * @param [in] a_cube Куб для создания выборки
+ */
 Selection::Selection(Cube* a_cube): m_cube(a_cube), m_aggregation_dim(new Dimension("Агрегации")) {
 	m_cube->m_selection = this;
 }
 
-
+/**
+ * @brief Создание выборки
+ * 
+ * 1. Итерация по Измерениям, Выборка создается только на основе указанного измерения
+ * 2. Создается вектор из ТочекДанных, на основе которых составляется Выборка.
+ * 3. Итерация по ТочкамДанных из вектора, если позиция в Измерении и Метрика совпадают с указанными,
+ * то в Выборку добавляются все ТочкиДанных, связанные с тем же Фактом.
+ * 4. Возврат значения, в зависимости от результата.
+ * 
+ * @param [in] a_dim_name Название Измерения
+ * @param [in] a_positions_list Список позиций в Измерении
+ * @param [in] a_measure_list Список Метрик
+ * @return enum сlass make_result Результат составления выборки: Куб удален/Неизвестное Измерение/Cоздана/Факты не найдены
+ */
 make_result Selection::make(const std::string& a_dim_name, const std::vector<std::string>& a_positions_list, const std::vector<std::string>& a_measure_list) {
 	// Проверка, существует ли куб
 	if (m_aggregation_dim == nullptr)

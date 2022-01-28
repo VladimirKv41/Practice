@@ -1,7 +1,11 @@
-#pragma once
+﻿#pragma once
 #include <string>
 
-// Метрика
+/**
+ * @brief Метрика
+ * 
+ * Класс хранящий название Метрики некоторых Фактов
+ */
 class Measure {
 public:
 

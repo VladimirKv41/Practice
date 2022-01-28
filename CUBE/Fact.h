@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <vector>
 #include <string>
 
@@ -6,7 +6,11 @@ class Dimension;
 class Measure;
 class DataPoint;
 
-// Факт
+/**
+ * @brief Факт
+ * 
+ * Класс хранящий значение и его Метрику
+ */
 class Fact {
 public:
 

@@ -1,10 +1,15 @@
-#pragma once
+﻿#pragma once
 #include <string>
 
 class Dimension;
 class Fact;
 
 // ТочкаДанных
+/**
+ * @brief ТочкаДанных
+ * 
+ * Класс связывающий Измерение и Факт для дальнейшего взаимодействия
+ */
 class DataPoint {
 public:
 	DataPoint(Fact* a_fact, Dimension* a_dim, uint32_t a_position);

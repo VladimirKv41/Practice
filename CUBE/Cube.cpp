@@ -1,4 +1,4 @@
-#include "Cube.h"
+﻿#include "Cube.h"
 #include "Dimension.h"
 #include "Measure.h"
 #include "Fact.h"
@@ -7,19 +7,21 @@
 #include <iostream>
 #include <algorithm>
 
-enum add_result {
-	UNKNOWN_MEASURE = -1,
-	ALREADY_EXIST,
-	ADDED
-};
-
+/**
+ * @brief Конструктор
+ * 
+ * По умолчанию ссылка на Выборку обнулена
+ */
 Cube::Cube() : m_selection(nullptr){
 
 }
 
-// Добавление Измерения
-// Если уже существует, вернет False
-//                             Название Измерения
+/**
+ * @brief Добавление Измерения
+ * 
+ * @param [in] a_dim_name Название Измерения
+ * @return Добавлено Измерение или нет
+ */
 bool Cube::add_Dimension(const std::string& a_dim_name) {
 	for (std::vector<Dimension*>::iterator it = m_dims.begin(); it != m_dims.end(); it++) {
 		if ((*it)->get_name() == a_dim_name) {
@@ -30,9 +32,12 @@ bool Cube::add_Dimension(const std::string& a_dim_name) {
 	return true;
 }
 
-// Добавление Метрики
-// Если уже существует, вернет False
-//                           Название Метрики
+/**
+ * @brief Добавление Метрики
+ * 
+ * @param [in] a_measure_name Название Метрики
+ * @return Добавлена Метрика или нет
+ */
 bool Cube::add_Measure(const std::string& a_measure_name) {
 	for (std::vector<Measure*>::iterator it = m_measures.begin(); it != m_measures.end(); it++) {
 		if ((*it)->get_name() == a_measure_name) {
@@ -43,12 +48,19 @@ bool Cube::add_Measure(const std::string& a_measure_name) {
 	return true;
 }
 
-// Добавление Факта
-// 1. Итерация по Метрикам, Факт добавляется только с указанной Метрикой.
-// 2. Поиск Факта в уже добавленных ранее.
-// 3. Добавление Факта и ТочекДанных.
-//                    Значение Факта     Название Метрики               Список позиций в Измерениях
-int8_t Cube::add_Fact(double a_value, const std::string& a_measure, const std::vector<std::string>& a_positions_list) {
+/**
+ * @brief Добавление Факта
+ * 
+ * 1. Итерация по Метрикам, Факт добавляется только с указанной Метрикой.
+ * 2. Поиск Факта в уже добавленных ранее.
+ * 3. Добавление Факта и ТочекДанных.
+ * 
+ * @param [in] a_value Значение Факта
+ * @param [in] a_measure Название Метрики
+ * @param [in] a_positions_list Список позиций в Измерениях
+ * @return enum class add_result Результат добавления Факта
+ */
+add_result Cube::add_Fact(double a_value, const std::string& a_measure, const std::vector<std::string>& a_positions_list) {
 	for (std::vector<Measure*>::iterator it_measure = m_measures.begin(); it_measure != m_measures.end(); it_measure++) {
 		// Проверка, соответсвует ли Метрика указанной
 		if ((*it_measure)->get_name() == a_measure) {
@@ -75,7 +87,7 @@ int8_t Cube::add_Fact(double a_value, const std::string& a_measure, const std::v
 							break;
 						}
 						if (i == m_dims.size() - 1) {
-							return ALREADY_EXIST;
+							return add_result::ALREADY_EXIST;
 						}
 						it_list++;
 					}
@@ -88,13 +100,15 @@ int8_t Cube::add_Fact(double a_value, const std::string& a_measure, const std::v
 				m_points.push_back(new DataPoint(m_facts.back(), *it_dim, (*it_dim)->get_mark(*it_list)));
 				it_list++;
 			}
-			return ADDED;
+			return add_result::ADDED;
 		}
 	}
-	return UNKNOWN_MEASURE;
+	return add_result::UNKNOWN_MEASURE;
 }
 
-// Очистка Куба
+/**
+ * @brief Очистка Куба
+ */
 void Cube::clean() {
 	// Если Выборка удалена/не существует
 	if(m_selection != nullptr)
@@ -105,15 +119,23 @@ void Cube::clean() {
 	clean_vector(m_points);
 }
 
+/**
+ * @brief Деструктор
+ */
 Cube::~Cube() {
 	clean();
 }
 
-// Очистка вектора указателей
+/**
+ * @brief Очистка вектора указателей
+ * 
+ * @param [in,out] a_vector Вектор из экземпляров классов
+ */
 template <class T>
 void Cube::clean_vector(std::vector<T*>& a_vector) {
 	for (class std::vector<T*>::iterator it = a_vector.begin(); it != a_vector.end(); it++) {
 		delete* it;
 	}
+	// Уменьшение размера вектора для нуля, т.к. после очистки остаются висячие указатели
 	a_vector.resize(0);
 }

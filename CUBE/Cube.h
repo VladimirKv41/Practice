@@ -1,6 +1,15 @@
-#pragma once
+﻿#pragma once
 #include <string>
 #include <vector>
+
+/**
+ * @brief Результат добавления Факта
+ */
+enum class add_result {
+	UNKNOWN_MEASURE = -1, // Неизвестная Метрика
+	ALREADY_EXIST, // Факт уже существует
+	ADDED // Факт добавлен
+};
 
 class Dimension;
 class Fact;
@@ -8,7 +17,11 @@ class Measure;
 class DataPoint;
 class Selection;
 
-// Куб
+/**
+ * @brief Куб
+ * 
+ * Класс для добавления и хранения данных
+ */
 class Cube{
 public:
 
@@ -23,7 +36,7 @@ public:
 	bool add_Measure(const std::string& a_measure_name);
 
 	// Добавление Факта
-	int8_t add_Fact(double a_value, const std::string& a_measure, const std::vector<std::string>& a_positions_list);
+	add_result add_Fact(double a_value, const std::string& a_measure, const std::vector<std::string>& a_positions_list);
 
     // Очистка Куба
 	void clean();
