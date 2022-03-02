@@ -7,9 +7,9 @@ class Measure;
 class DataPoint;
 
 /**
- * @brief Факт
+ * @brief Факт.
  * 
- * Класс хранящий значение и его Метрику
+ * Класс хранящий значение и его Метрику.
  */
 class Fact {
 public:

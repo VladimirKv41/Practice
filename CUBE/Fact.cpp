@@ -3,7 +3,7 @@
 
 
 /**
- * @brief Конструктор
+ * @brief Конструктор.
  * 
  * @param [in] a_value Значение
  * @param [in,out] a_mes Метрика
@@ -13,7 +13,7 @@ Fact::Fact(double a_value,Measure* a_mes) : m_value(a_value), m_mes(a_mes) {
 }
 
 /**
- * @brief Добавление связанной ТочкиДанных
+ * @brief Добавление связанной ТочкиДанных.
  * 
  * @param [in,out] a_point ТочкаДанных
  */
@@ -22,7 +22,7 @@ void Fact::push_DataPoint(DataPoint* a_point) {
 }
 
 /**
- * @brief Получение вектора связанных ТочекДанных
+ * @brief Получение вектора связанных ТочекДанных.
  * 
  * @return Вектор связанных ТочекДанных
  */
@@ -31,7 +31,7 @@ const std::vector<DataPoint*>& Fact::get_DataPoints() const {
 }
 
 /**
- * @brief Получение значения Факта
+ * @brief Получение значения Факта.
  * 
  * @return значения Факта
  */
@@ -40,7 +40,7 @@ double Fact::get_value() const {
 }
 
 /**
- * @brief Получение названия Метрики Факта
+ * @brief Получение названия Метрики Факта.
  * 
  * @return название Метрики
  */
@@ -49,7 +49,7 @@ const std::string& Fact::get_Measure_name() const {
 }
 
 /**
- * @brief Получение связанной Метрики
+ * @brief Получение связанной Метрики.
  * 
  * @return связанная Метрика
  */

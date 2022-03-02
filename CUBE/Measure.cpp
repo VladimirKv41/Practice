@@ -1,7 +1,7 @@
 ﻿#include "Measure.h"
 
 /**
- * @brief Конструктор
+ * @brief Конструктор.
  * 
  * @param [in,out] a_name Название Метрики
  */
@@ -10,7 +10,7 @@ Measure::Measure(const std::string& a_name) : m_name(a_name) {
 }
 
 /**
- * @brief Получение название Метрики
+ * @brief Получение название Метрики.
  * 
  * @return название Метрики
  */

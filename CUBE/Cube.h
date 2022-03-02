@@ -1,9 +1,11 @@
 ﻿#pragma once
 #include <string>
 #include <vector>
+#include <map>
+#include <unordered_map>
 
 /**
- * @brief Результат добавления Факта
+ * @brief Результат добавления Факта.
  */
 enum class add_result {
 	UNKNOWN_MEASURE = -1, // Неизвестная Метрика
@@ -18,7 +20,7 @@ class DataPoint;
 class Selection;
 
 /**
- * @brief Куб
+ * @brief Куб.
  * 
  * Класс для добавления и хранения данных
  */
@@ -29,14 +31,14 @@ public:
 
 	Cube();
 
-	// добавление Измерения
+	// Добавление Измерения
 	bool add_Dimension(const std::string& a_dim_name);
 
-	// добавление Метрика
+	// Добавление Метрика
 	bool add_Measure(const std::string& a_measure_name);
 
 	// Добавление Факта
-	add_result add_Fact(double a_value, const std::string& a_measure, const std::vector<std::string>& a_positions_list);
+	add_result add_Fact(double a_value, const std::string& a_measure_name, const std::vector<std::string>& a_positions_list);
 
     // Очистка Куба
 	void clean();
@@ -45,12 +47,14 @@ public:
 
 private:
 
+	// Поиск Метрики
+	std::vector<Measure*>::const_iterator find_measure(const std::string& a_measure_name);
+
 	// Очистка вектора указателей
 	template <class T>
 	void clean_vector(std::vector<T*>& a_vector);
-
-	// Вектора Фактов/Измерений/Метрик/ТочекДанных Куба
-	std::vector<Fact*> m_facts;
+	// Контейнеры Фактов/Измерений/Метрик/ТочекДанных Куба
+	std::multimap<std::pair<std::string, std::vector<std::string>>, Fact*> m_facts;
 	std::vector<Dimension*> m_dims;
 	std::vector<Measure*> m_measures;
 	std::vector<DataPoint*> m_points;

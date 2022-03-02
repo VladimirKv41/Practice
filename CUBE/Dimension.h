@@ -1,14 +1,15 @@
 ﻿#pragma once
 #include <string>
 #include <vector>
+#include <map>
 
 class DataPoint;
+class DimensionPosition;
 
-// Измерение
 /**
- * @brief Измерение
+ * @brief Измерение.
  * 
- * Класс для хранения и работы с одной из "осей" Куба
+ * Класс для хранения и работы с одной из "осей" Куба.
  */
 class Dimension {
 public:
@@ -21,21 +22,24 @@ public:
 	// Получение вектора связанных ТочекДанных
 	const std::vector<DataPoint*>& get_DataPoints() const;
 
-	// Получение индекса позиции в Измерении
-	uint32_t get_mark(const std::string &a_mark);
+	// Получение Позиции в Измерении
+	DimensionPosition* const get_DimensionPosition(const std::string &a_mark);
 
-	// Поиск позиции в Измерении
+	// Поиск Позиции в Измерении
 	bool search_mark(const std::string &a_mark) const;
 
 	// Получение названия Измерения
 	const std::string& get_name() const;
 
-	// Получение вектора позиций Измерения
-	const std::vector<std::string>& get_positions() const;
+	// Получение ассоциативного массива Позиций на Измерении
+	const std::map<std::string, DimensionPosition*>& get_positions() const;
+
+	~Dimension();
 	
 private:
-	// Вектор позиций Измерения
-	std::vector<std::string> m_vector;
+	// Ассоциативного массив Позиций на Измерении
+	// Ключ: название Позиции
+	std::map<std::string,DimensionPosition*> m_positions_map;
 	// Название Измерения
 	std::string m_name;
 	// Вектор связанных ТочекДанных
