@@ -65,8 +65,6 @@ private:
 			return hash1 ^ hash2;
 		}
 	};
-	// Ассоциативный массив, ключ: название Позиции в Измерении, значение: указатель на Позицию
-	typedef std::map<std::string, DimensionPosition*> dim_positions_map;
 
 	// Тип данных m_selection_points
 	// Ассоциативный массив, ключ: пара <Название Измерения, Название Позиции на Измерении>,
@@ -78,7 +76,7 @@ private:
 	std::vector<Dimension*>::const_iterator find_dimension(const std::string& a_dimension_name) const;
 
 	// Заполнение Выборки (для изначально пустой Выборки)
-	void making(const dim_positions_map& a_map_from,
+	void making(const std::map<std::string, DimensionPosition*>& a_map_from,
 		const std::string& a_dim_name, const std::vector<std::string>& a_positions_list, const std::set<std::string>& a_measure_list);
 
 	// Заполнение Выборки (для уже заполненной Выборки)
